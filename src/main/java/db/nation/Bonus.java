@@ -16,95 +16,74 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
-	public class Bonus {
-		public static void main(String[] args) throws SQLException{
+public class Bonus {
+	public static void main(String[] args) throws SQLException {
+		String url = "jdbc:mysql://localhost:3306/db-nations";
+		String user = "root";
+		String password = "root";
+		int input;
+		Scanner s = new Scanner(System.in);
+		System.out.println("Ecco la lista di tutti i paesi");
+		System.out.println("");
+		Connection con = DriverManager.getConnection(url, user, password);
 
-			 String url = "jdbc:mysql://localhost:3306/db-nations";
-			 String user = "root";
-			 String password = "root";
-			 int input;
-			 Scanner s=new Scanner(System.in);			 
-			 System.out.println("Ecco la lista di tutti i paesi");
-			 System.out.println("");
-			 	try (Connection con = DriverManager.getConnection(url, user, password)){
-				  
-			 		String sql="select c.name, c.country_id , r.name , c2.name  from countries c \r\n"
-				  		+ "join regions r on c.region_id = r.region_id \r\n"
-				  		+ "join continents c2 on c2.continent_id = r.continent_id \r\n"
-				  		+ "order by c.name asc";
-				 
-			 		try(PreparedStatement ps=con.prepareStatement(sql)) {
-					  
-					  
-					try(ResultSet rs = ps.executeQuery()) {
-						  
-						  System.out.println("");
-						  while (rs.next()) { //se c'è qualcosa da leggere
-							  System.out.println(
-									  "ID: "+ rs.getInt("c.country_id") + "   -   " +
-									  "Country: "+ rs.getString("c.name") + "   -   " +
-									  "Region: "+ rs.getString("r.name") + "   -   " +
-									  "Continent: "+ rs.getString("c2.name"));	  
-						  } 
-					  }
-					  
-				  }
-			  } catch (SQLException ex) {
-			     ex.printStackTrace();
-			  }
-				 System.out.println("Inserisci il codice di un paese per vedere i dettagli");
-				 input = (s.nextInt());
-				  try (Connection con = DriverManager.getConnection(url, user, password)){
-					  
-					  String sql="select l.language  from countries c \r\n"
-					  		+ "join country_languages cl on c.country_id = cl.country_id \r\n"
-					  		+ "join languages l on l.language_id = cl.language_id\r\n"
-					  		+ "where c.country_id = ?\r\n";
-					 
-					  try(PreparedStatement ps=con.prepareStatement(sql)) {
-						  
-						  ps.setInt(1, input);
-						  
-						  try(ResultSet rs = ps.executeQuery()) {
-							  
-							  System.out.println("Lingue parlate: ");
-							  while (rs.next()) { //se c'è qualcosa da leggere
-								  System.out.print(rs.getString("l.language") + "   ");	  
-							  } 
-						  }
-						  
-					  }
-				  } catch (SQLException ex) {
-				     ex.printStackTrace();
-				  }
-				  try (Connection con = DriverManager.getConnection(url, user, password)){
-					  
-					  String sql="select cs.population , cs.gdp , cs.year from country_stats cs\r\n"
-					  		+ "join countries c on c.country_id = cs.country_id \r\n"
-					  		+ "where c.country_id = 1\r\n"
-					  		+ "order by cs.year desc  \r\n"
-					  		+ "limit ?";
-					 
-					  try(PreparedStatement ps=con.prepareStatement(sql)) {
-						  
-						  ps.setInt(1, input);
-						  
-						  try(ResultSet rs = ps.executeQuery()) {
-							  System.out.println("");
-							  System.out.println("Dati: ");
-							  while (rs.next()) { //se c'è qualcosa da leggere
-								  System.out.println("Population : " + rs.getInt("cs.population"));
-								  System.out.println("Gdp : " + rs.getDouble("cs.gdp"));
-								  System.out.println("Updated on : " + rs.getInt("cs.year"));	  
-								  } 
-							  }
-							  
-						  }
-					  } catch (SQLException ex) {
-					     ex.printStackTrace();
-					  }
-			
-				  s.close();		
+		String sql = "select c.name, c.country_id , r.name , c2.name  from countries c \r\n"
+				+ "join regions r on c.region_id = r.region_id \r\n"
+				+ "join continents c2 on c2.continent_id = r.continent_id \r\n" + "order by c.name asc";
+
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+
+			try (ResultSet rs = ps.executeQuery()) {
+
+				System.out.println("");
+				while (rs.next()) { // se c'è qualcosa da leggere
+					System.out.println("ID: " + rs.getInt("c.country_id") + "   -   " + "Country: "
+							+ rs.getString("c.name") + "   -   " + "Region: " + rs.getString("r.name") + "   -   "
+							+ "Continent: " + rs.getString("c2.name"));
+				}
+			}
 		}
+
+		System.out.println("Inserisci il codice di un paese per vedere i dettagli");
+		input = (s.nextInt());
+
+		sql = "select l.language  from countries c \r\n"
+				+ "join country_languages cl on c.country_id = cl.country_id \r\n"
+				+ "join languages l on l.language_id = cl.language_id\r\n" + "where c.country_id = ?\r\n";
+
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setInt(1, input);
+
+			try (ResultSet rs = ps.executeQuery()) {
+
+				System.out.println("Lingue parlate: ");
+				while (rs.next()) { // se c'è qualcosa da leggere
+					System.out.print(rs.getString("l.language") + "   ");
+				}
+			}
+		}
+
+		sql = "select cs.population , cs.gdp , cs.year from country_stats cs\r\n"
+				+ "join countries c on c.country_id = cs.country_id \r\n" + "where c.country_id = 1\r\n"
+				+ "order by cs.year desc  \r\n" + "limit ?";
+
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setInt(1, input);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				System.out.println("");
+				System.out.println("Dati: ");
+				while (rs.next()) { // se c'è qualcosa da leggere
+					System.out.println("Population : " + rs.getInt("cs.population"));
+					System.out.println("Gdp : " + rs.getDouble("cs.gdp"));
+					System.out.println("Updated on : " + rs.getInt("cs.year"));
+				}
+			}
+		}
+		con.close();
+		s.close();
+	}
 
 }
